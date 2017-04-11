@@ -1,10 +1,10 @@
-class Account::GroupsController < ApplicationController
-  before_action :authenticate_user!
+class GroupsController < ApplicationController
 
+  before_action :authenticate_user! , only: [:new, :create, :edit, :update, :destory, :join , :quit]
+  before_action :find_group_and_check_permission, only: [:edit, :update, :destroy]
   def index
-    @groups = current_user.participated_groups
+    @groups = Group.all
   end
-end
 
 
   def show
@@ -21,7 +21,7 @@ end
      else
        render :edit
      end
-   end
+  end
 
    def destroy
      @group.destroy
@@ -34,16 +34,16 @@ end
   end
 
   def create
-  @group = Group.new(group_params)
-  @group.user = current_user
+    @group = Group.new(group_params)
+    @group.user = current_user
 
-  if @group.save
-    current_user.join!(@group)
-    redirect_to groups_path
-  else
+    if @group.save
+      current_user.join!(@group)
+      redirect_to groups_path
+    else
     render :new
+    end
   end
-end
 
    def join
     @group = Group.find(params[:id])
